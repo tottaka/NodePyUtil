@@ -8,5 +8,5 @@ I made the project in Visual Studio 2019, so it is best to just open it with tha
 
 ## Usage
 You simply open the device in the 'Port Settings' tab with the specified settings.
-Right-click files/folders to get see all available file operations.
+Right-click files/folders to see all available operations.
 If you double-click a file, it will download the file and open it with the default program for that file. Additionally, any time you write to the opened file it will automatically re-upload the changed file to the board.
