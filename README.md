@@ -4,7 +4,7 @@ Sorry for the sloppy code - if you would like to contribute to this project/clea
 I made this quick & dirty project as an alternative to the [Adafruit MicroPython Tool](https://github.com/scientifichackers/ampy).
 
 ## Installation
-I made the project in Visual Studio 2019, so it is best to just open it with that and either run it from there or just build it and use the standalone executable file.
+I made the project in Visual Studio 2019, so it's best to open it with that and either run it from there or build it and use the standalone executable file.
 
 ## Usage
 You simply open the device in the 'Port Settings' tab with the specified settings.
