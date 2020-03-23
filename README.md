@@ -10,3 +10,6 @@ I made the project in Visual Studio 2019, so it's best to open it with that and 
 You simply open the device in the 'Port Settings' tab with the specified settings.
 Right-click files/folders to see all available operations.
 If you double-click a file, it will download the file and open it with the default program for that file. Additionally, any time you write to the opened file it will automatically re-upload the changed file to the board.
+
+## Credits
+TinyJSON - https://github.com/gering/Tiny-JSON
