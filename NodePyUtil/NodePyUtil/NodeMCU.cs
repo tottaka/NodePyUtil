@@ -232,13 +232,9 @@ namespace NodePyUtil
         }
     }
 
-    [Serializable]
     public class NodeFile
     {
-        [JsonProperty("name")]
         public string Name { get; set; }
-
-        [JsonProperty("dir")]
         public bool IsDirectory { get; set; }
     }
 }

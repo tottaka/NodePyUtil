@@ -89,16 +89,20 @@ namespace NodePyUtil
 
                 if (!OpenFiles.ContainsKey(selectedFile)) {
                     SafeFileSystemWatcher watcher = new SafeFileSystemWatcher(Path.GetDirectoryName(localFilePath), Path.GetFileName(localFilePath));
-                    watcher.Changed += (s, eventArgs) => {
-                        Invoke((MethodInvoker)delegate {
-                            Enabled = false;
 
+                    watcher.BeforeChange += (s, eventArgs) => {
+                        Enabled = false;
+                    };
+
+                    watcher.AfterChange += (s, eventArgs) => {
+                        Invoke((MethodInvoker)delegate {
                             Device.Upload(eventArgs.FullPath, selectedFile);
                             SystemSounds.Hand.Play();
 
                             Enabled = true;
                         });
                     };
+
                     OpenFiles.Add(selectedFile, watcher);
                 }
 

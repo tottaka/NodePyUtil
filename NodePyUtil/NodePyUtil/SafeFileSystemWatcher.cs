@@ -11,7 +11,8 @@ namespace NodePyUtil
         public int Threshold = 1000;
         public bool IsDisposed { get; private set; }
 
-        public event EventHandler<FileSystemEventArgs> Changed;
+        public event EventHandler<FileSystemEventArgs> BeforeChange;
+        public event EventHandler<FileSystemEventArgs> AfterChange;
 
         private readonly object ThreadLock = new object();
         private FileSystemWatcher Watcher;
@@ -38,6 +39,7 @@ namespace NodePyUtil
                 if (!Waiting)
                 {
                     Waiting = true;
+                    BeforeChange?.Invoke(this, e);
                     Task.Run(() => {
                         while (true)
                         {
@@ -52,7 +54,7 @@ namespace NodePyUtil
                         }
 
                         Waiting = false;
-                        Changed?.Invoke(this, e);
+                        AfterChange?.Invoke(this, e);
                     });
                 }
             }
