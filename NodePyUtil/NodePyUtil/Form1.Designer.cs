@@ -54,6 +54,7 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.resetDeviceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.replMonitorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -231,6 +232,7 @@
             // deviceToolStripMenuItem
             // 
             this.deviceToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.replMonitorToolStripMenuItem,
             this.toolStripSeparator1,
             this.resetDeviceToolStripMenuItem});
             this.deviceToolStripMenuItem.Enabled = false;
@@ -242,12 +244,12 @@
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(137, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // resetDeviceToolStripMenuItem
             // 
             this.resetDeviceToolStripMenuItem.Name = "resetDeviceToolStripMenuItem";
-            this.resetDeviceToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
+            this.resetDeviceToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.resetDeviceToolStripMenuItem.Text = "Reset Device";
             this.resetDeviceToolStripMenuItem.Click += new System.EventHandler(this.resetDeviceToolStripMenuItem_Click);
             // 
@@ -260,6 +262,13 @@
             this.refreshToolStripMenuItem.ToolTipText = "Refresh the file tree";
             this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshToolStripMenuItem_Click);
             // 
+            // replMonitorToolStripMenuItem
+            // 
+            this.replMonitorToolStripMenuItem.Name = "replMonitorToolStripMenuItem";
+            this.replMonitorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.replMonitorToolStripMenuItem.Text = "Repl Monitor";
+            this.replMonitorToolStripMenuItem.Click += new System.EventHandler(this.replMonitorToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -267,6 +276,7 @@
             this.ClientSize = new System.Drawing.Size(496, 361);
             this.Controls.Add(this.treeView1);
             this.Controls.Add(this.menuStrip1);
+            this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
@@ -306,6 +316,7 @@
         private System.Windows.Forms.ToolStripMenuItem uploadFolderToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripMenuItem refreshToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem replMonitorToolStripMenuItem;
     }
 }
 

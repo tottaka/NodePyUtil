@@ -450,6 +450,18 @@ namespace NodePyUtil
             string[] tree = path.Split(new char[] { '\\', '/' }, StringSplitOptions.RemoveEmptyEntries);
             return tree[tree.Length - 1].TrimStart('\\', '/').TrimEnd('\\', '/').Trim();
         }
+
+        private void replMonitorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Enabled = false;
+
+            Device.Execute(exec => {
+                using (ReplForm form = new ReplForm(exec))
+                    form.ShowDialog();
+            });
+
+            Enabled = true;
+        }
     }
 
     public static class TreeViewExtensions
