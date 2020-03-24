@@ -319,7 +319,7 @@ namespace NodePyUtil
             try
             {
                 string output = Device.ExecuteFile(scriptFile).Trim();
-                MessageBox.Show(output, $"Error running '{scriptFile}'");
+                MessageBox.Show(output, $"Output from '{scriptFile}'");
             }
             catch(Exception ex)
             {
