@@ -315,7 +315,16 @@ namespace NodePyUtil
             // create repl window and run script file in it
             // also display the script output in the repl window
             string scriptFile = SelectedFilePath.Replace("\\", "/").Trim();
-            MessageBox.Show(Device.ExecuteFile(scriptFile).Trim(), $"Output from '{scriptFile}'");
+
+            try
+            {
+                string output = Device.ExecuteFile(scriptFile).Trim();
+                MessageBox.Show(output, $"Error running '{scriptFile}'");
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message, $"Error running '{scriptFile}'");
+            }
         }
 
         public void EnableConnectedControls()
