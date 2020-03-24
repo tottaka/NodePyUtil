@@ -77,6 +77,41 @@ namespace NodePyUtil
         }
 
         /// <summary>
+        /// Use this carefully!
+        /// </summary>
+        public async void ExecuteRaw(string command, Action<string> callback, Action exit, int timeout)
+        {
+            EnterRawRepl();
+
+            try
+            {
+                await Task.Delay(100);
+                Task t = Task.Run(delegate
+                {
+                    try
+                    {
+                        Exec(command, callback, timeout);
+                    }
+                    catch (Exception ex)
+                    {
+                        callback(ex.Message + Environment.NewLine);
+                    }
+                });
+
+                await t;
+            }
+            catch(Exception ex)
+            {
+                ExitRawRepl();
+                exit?.Invoke();
+                throw ex;
+            }
+
+            ExitRawRepl();
+            exit?.Invoke();
+        }
+
+        /// <summary>
         /// Enters raw mode, executes the command, then exits raw mode and returns the output.
         /// </summary>
         public string ExecuteRaw(string command, int timeout = 0)
@@ -103,6 +138,36 @@ namespace NodePyUtil
             }
         }
 
+        private void ReadUntil(char value, int timeout, Action<string> outputHandler)
+        {
+            lock (ThreadLock)
+            {
+                long millisTimeout = 0;
+                char ch = '\0';
+                while (ch != value)
+                {
+                    if (Connection.BytesToRead > 0)
+                    {
+                        ch = (char)Connection.ReadChar();
+                        millisTimeout = 0;
+
+                        if (ch == '\x04')
+                            break;
+
+                        outputHandler(ch.ToString());
+                    }
+                    else
+                    {
+                        millisTimeout += 1;
+                        if (millisTimeout >= timeout)
+                            throw new TimeoutException($"Read operation timed out after {millisTimeout}ms.");
+
+                        Thread.Sleep(1);
+                    }
+                }
+            }
+        }
+
         private string ReadUntil(string value, int timeout)
         {
             lock (ThreadLock)
@@ -113,8 +178,12 @@ namespace NodePyUtil
                 {
                     if (Connection.BytesToRead > 0)
                     {
-                        buffer += (char)Connection.ReadChar();
+                        char ch = (char)Connection.ReadChar();
                         millisTimeout = 0;
+
+                        if (ch == '\x04')
+                            break;
+                        buffer += ch;
                     }
                     else
                     {
@@ -139,18 +208,33 @@ namespace NodePyUtil
             }
         }
 
-        private string Exec(string command, int timeout)
+        private void Exec(string command, Action<string> outputHandler, int timeout = int.MaxValue)
         {
             Connection.Write($"{command}\x04");
 
             ReadUntil("OK", timeout);
-            string output = WaitForEot(timeout).Trim();
+            ReadUntil('\x04', timeout, outputHandler);
 
             string error = ReadUntil("\x04", 100);
             if (!string.IsNullOrWhiteSpace(error))
                 throw new InvalidOperationException(error);
+        }
 
-            return output;
+        private string Exec(string command, int timeout)
+        {
+            lock (ThreadLock)
+            {
+                Connection.Write($"{command}\x04");
+
+                ReadUntil("OK", timeout);
+                string output = WaitForEot(timeout).Trim();
+
+                string error = ReadUntil("\x04", 100);
+                if (!string.IsNullOrWhiteSpace(error))
+                    throw new InvalidOperationException(error);
+
+                return output;
+            }
         }
 
         private void EnterRawRepl()

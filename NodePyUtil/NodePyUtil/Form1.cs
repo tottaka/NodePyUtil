@@ -322,8 +322,11 @@ namespace NodePyUtil
 
             try
             {
-                string output = Device.ExecuteFile(scriptFile).Trim();
-                MessageBox.Show(output, $"Output from '{scriptFile}'");
+                using (ReplForm replWindow = new ReplForm(Device.Execute))
+                {
+                    replWindow.RunCommand($"exec( open( '{scriptFile}' ).read() )");
+                    replWindow.ShowDialog();
+                }
             }
             catch(Exception ex)
             {
@@ -459,10 +462,8 @@ namespace NodePyUtil
         {
             Enabled = false;
 
-            Device.Execute(exec => {
-                using (ReplForm form = new ReplForm(exec))
-                    form.ShowDialog();
-            });
+            using (ReplForm form = new ReplForm(Device.Execute))
+                form.ShowDialog();
 
             Enabled = true;
         }

@@ -5,9 +5,10 @@ namespace NodePyUtil
 {
     public partial class ReplForm : Form
     {
-        private SimpleRepl.ReplExecDelegate Execute;
+        private Action<string, Action<string>, Action, int> Execute;
+        private bool CanClose = false;
 
-        public ReplForm(SimpleRepl.ReplExecDelegate exeCallback)
+        public ReplForm(Action<string, Action<string>, Action, int> exeCallback)
         {
             Execute = exeCallback;
             InitializeComponent();
@@ -18,23 +19,17 @@ namespace NodePyUtil
 
         }
 
+        private void ReplForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            e.Cancel = e.CloseReason == CloseReason.UserClosing && !CanClose;
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(textBox1.Text))
                 return;
 
-
-            richTextBox1.AppendText(textBox1.Text + Environment.NewLine);
-
-            try
-            {
-                Append(Execute(textBox1.Text));
-            }
-            catch(InvalidOperationException ex)
-            {
-                Append(ex.Message);
-            }
-
+            RunCommand(textBox1.Text.Trim());
             textBox1.Text = string.Empty;
         }
 
@@ -50,7 +45,31 @@ namespace NodePyUtil
 
         public void Append(string text)
         {
-            richTextBox1.AppendText(text + Environment.NewLine + ">>>");
+            Invoke((MethodInvoker)delegate {
+                richTextBox1.AppendText(text);
+            });
+        }
+
+        public void RunCommand(string command, int timeout = int.MaxValue)
+        {
+            try
+            {
+                textBox1.Enabled = false;
+                CanClose = false;
+                richTextBox1.AppendText(command + Environment.NewLine);
+                Execute(command, Append, PostRunCommand, timeout);
+            }
+            catch (InvalidOperationException ex)
+            {
+                Append(ex.Message + Environment.NewLine);
+            }
+        }
+
+        private void PostRunCommand()
+        {
+            textBox1.Enabled = true;
+            CanClose = true;
+            Append(Environment.NewLine + ">>>");
         }
     }
 }

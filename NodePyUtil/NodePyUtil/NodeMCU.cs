@@ -215,6 +215,15 @@ namespace NodePyUtil
             }
         }
 
+
+        public void Execute(string command, Action<string> callback, Action exit, int timeout = int.MaxValue)
+        {
+            lock (ThreadLock)
+            {
+                Repl.ExecuteRaw(command, callback, exit, timeout);
+            }
+        }
+
         public string ExecuteFile(string path)
         {
             lock (ThreadLock)
@@ -227,7 +236,7 @@ namespace NodePyUtil
         {
             lock (ThreadLock)
             {
-                return Repl.ExecuteRaw(command);
+                return Repl.ExecuteRaw(command, 0);
             }
         }
     }
