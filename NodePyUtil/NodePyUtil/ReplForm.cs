@@ -6,7 +6,7 @@ namespace NodePyUtil
     public partial class ReplForm : Form
     {
         private Action<string, Action<string>, Action, int> Execute;
-        private bool CanClose = false;
+        private bool CanClose = true;
 
         public ReplForm(Action<string, Action<string>, Action, int> exeCallback)
         {
@@ -31,6 +31,11 @@ namespace NodePyUtil
 
             RunCommand(textBox1.Text.Trim());
             textBox1.Text = string.Empty;
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            richTextBox1.Text = ">>>";
         }
 
         private void textBox1_KeyDown(object sender, KeyEventArgs e)

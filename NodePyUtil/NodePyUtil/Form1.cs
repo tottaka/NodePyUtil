@@ -159,7 +159,7 @@ namespace NodePyUtil
             Enabled = false;
 
             string selectedFile = SelectedFilePath.Trim();
-            if (this.ShowPrompt("File name:", $"Create new file: \\{selectedFile}", out string fileName, allowedChars: "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ_-.1234567890") == DialogResult.OK)
+            if (this.ShowPrompt("File name:", $"Create new file: \\{selectedFile}", out string fileName, deniedChars: "/\\:*?\"<>|!@#$%^&()+-") == DialogResult.OK)
             {
                 NodeFile file = (NodeFile)treeView1.SelectedNode.Tag;
                 if (file.IsDirectory)
@@ -185,7 +185,7 @@ namespace NodePyUtil
             Enabled = false;
 
             string selectedFile = SelectedFilePath.Trim();
-            if (this.ShowPrompt("Folder name:", $"Create new folder: \\{selectedFile}", out string fileName, allowedChars: "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ_-1234567890") == DialogResult.OK)
+            if (this.ShowPrompt("Folder name:", $"Create new folder: \\{selectedFile}", out string fileName, deniedChars: "/\\;:*?\"<>|!@#$%^&()+-,`~") == DialogResult.OK)
             {
                 NodeFile file = (NodeFile)treeView1.SelectedNode.Tag;
                 if (file.IsDirectory)
