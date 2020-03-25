@@ -79,7 +79,7 @@ namespace NodePyUtil
         /// <summary>
         /// Use this carefully!
         /// </summary>
-        public async void ExecuteRaw(string command, Action<string> callback, Action exit, int timeout)
+        public async void ExecuteRaw(string command, Action<string> callback, Action exit, ManualResetEventSlim cancelEvent)
         {
             EnterRawRepl();
 
@@ -90,7 +90,7 @@ namespace NodePyUtil
                 {
                     try
                     {
-                        Exec(command, callback, timeout);
+                        Exec(command, callback, cancelEvent);
                     }
                     catch (Exception ex)
                     {
@@ -138,18 +138,16 @@ namespace NodePyUtil
             }
         }
 
-        private void ReadUntil(char value, int timeout, Action<string> outputHandler)
+        private void ReadUntil(char value, Action<string> outputHandler, ManualResetEventSlim resetEvent)
         {
             lock (ThreadLock)
             {
-                long millisTimeout = 0;
                 char ch = '\0';
-                while (ch != value)
+                while (ch != value && !resetEvent.IsSet)
                 {
                     if (Connection.BytesToRead > 0)
                     {
                         ch = (char)Connection.ReadChar();
-                        millisTimeout = 0;
 
                         if (ch == '\x04')
                             break;
@@ -158,11 +156,8 @@ namespace NodePyUtil
                     }
                     else
                     {
-                        millisTimeout += 1;
-                        if (millisTimeout >= timeout)
-                            throw new TimeoutException($"Read operation timed out after {millisTimeout}ms.");
-
-                        Thread.Sleep(1);
+                        if (resetEvent.Wait(1))
+                            break;
                     }
                 }
             }
@@ -208,12 +203,21 @@ namespace NodePyUtil
             }
         }
 
-        private void Exec(string command, Action<string> outputHandler, int timeout = int.MaxValue)
+        private void Exec(string command, Action<string> outputHandler, ManualResetEventSlim cancelEvent)
         {
             Connection.Write($"{command}\x04");
 
-            ReadUntil("OK", timeout);
-            ReadUntil('\x04', timeout, outputHandler);
+            ReadUntil("OK", 10000);
+            ReadUntil('\x04', outputHandler, cancelEvent);
+
+            if (cancelEvent.IsSet)
+            {
+                // ctrl-C twice to interrupt any running program
+                Connection.Write("\r\x03");
+                Thread.Sleep(100);
+                Connection.Write("\r\x03");
+                Thread.Sleep(100);
+            }
 
             string error = ReadUntil("\x04", 100);
             if (!string.IsNullOrWhiteSpace(error))

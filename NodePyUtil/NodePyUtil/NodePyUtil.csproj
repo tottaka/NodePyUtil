@@ -70,14 +70,6 @@
     </Compile>
     <Compile Include="SafeFileSystemWatcher.cs" />
     <Compile Include="SimpleRepl.cs" />
-    <Compile Include="TinyJSON\DefaultDecoder.cs" />
-    <Compile Include="TinyJSON\DefaultEncoder.cs" />
-    <Compile Include="TinyJSON\Extensions.cs" />
-    <Compile Include="TinyJSON\Json.cs" />
-    <Compile Include="TinyJSON\JsonAttributes.cs" />
-    <Compile Include="TinyJSON\JsonBuilder.cs" />
-    <Compile Include="TinyJSON\JsonMapper.cs" />
-    <Compile Include="TinyJSON\JsonParser.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -108,7 +100,6 @@
     <EmbeddedResource Include="ReplForm.resx">
       <DependentUpon>ReplForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="TinyJSON\LICENSE.txt" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="nodemcu-logo.ico" />

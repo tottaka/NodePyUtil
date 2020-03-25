@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO.Ports;
-using Tiny;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NodePyUtil
 {
@@ -177,7 +178,10 @@ namespace NodePyUtil
                 Execute(exec => {
                     exec("import os\nimport ujson\nresults = []");
 
-                    string[] fileList = Json.Decode<string[]>(exec($"print( ujson.dumps(os.listdir( '{ path }' ) ) )"));
+                    string[] fileList = exec($"print( '\\r\\n'.join( os.listdir( '{ path }' ) ) )").Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                    for (int i = 0; i < fileList.Length; i++)
+                        fileList[i] = fileList[i].Trim();
+
                     foreach(string file in fileList)
                     {
                         try
@@ -216,11 +220,11 @@ namespace NodePyUtil
         }
 
 
-        public void Execute(string command, Action<string> callback, Action exit, int timeout = int.MaxValue)
+        public void Execute(string command, Action<string> callback, Action exit, ManualResetEventSlim resetEvent)
         {
             lock (ThreadLock)
             {
-                Repl.ExecuteRaw(command, callback, exit, timeout);
+                Repl.ExecuteRaw(command, callback, exit, resetEvent);
             }
         }
 
