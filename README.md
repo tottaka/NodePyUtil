@@ -11,8 +11,5 @@ You simply open the device in the 'Port Settings' tab with the specified setting
 Right-click files/folders to see all available operations.
 If you double-click a file, it will download the file and open it with the default program for that file. Additionally, any time you write to the opened file it will automatically re-upload the changed file to the board.
 
-## Credits
-TinyJSON - https://github.com/gering/Tiny-JSON
-
 ![Screenshot](https://github.com/tottaka/NodePyUtil/blob/master/screenshots/window.png)
 ![Screenshot](https://github.com/tottaka/NodePyUtil/blob/master/screenshots/repl-window.png)
