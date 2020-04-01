@@ -238,12 +238,12 @@ namespace NodePyUtil
             NodeFile file = (NodeFile)treeView1.SelectedNode.Tag;
             if (MessageBox.Show(string.Format("Are you sure you want to remove the {0} at '{1}'?\nYou can't undo this action.", file.IsDirectory ? "directory" : "file", SelectedFilePath.Replace("\\", "/").Trim()), "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
             {
-                Enabled = true;
+                Enabled = false;
                 if (file.IsDirectory)
                     Device.DeleteDirectory(SelectedFilePath.Replace("\\", "/").Trim());
                 else Device.DeleteFile(SelectedFilePath.Replace("\\", "/").Trim());
                 treeView1.SelectedNode.Remove();
-                Enabled = false;
+                Enabled = true;
             }
         }
 
