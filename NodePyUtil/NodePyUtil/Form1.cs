@@ -23,6 +23,8 @@ namespace NodePyUtil
 
         public string SelectedFileName => treeView1.SelectedNode.Text.Trim();
 
+        private readonly object ThreadLock = new object();
+
         public Form1()
         {
             InitializeComponent();
@@ -91,16 +93,21 @@ namespace NodePyUtil
                     SafeFileSystemWatcher watcher = new SafeFileSystemWatcher(Path.GetDirectoryName(localFilePath), Path.GetFileName(localFilePath));
 
                     watcher.BeforeChange += (s, eventArgs) => {
-                        Enabled = false;
+                        lock(ThreadLock)
+                            Enabled = false;
                     };
 
                     watcher.AfterChange += (s, eventArgs) => {
-                        Invoke((MethodInvoker)delegate {
-                            Device.Upload(eventArgs.FullPath, selectedFile);
-                            SystemSounds.Hand.Play();
+                        lock (ThreadLock)
+                        {
+                            Invoke((MethodInvoker)delegate
+                            {
+                                Device.Upload(eventArgs.FullPath, selectedFile);
+                                SystemSounds.Hand.Play();
 
-                            Enabled = true;
-                        });
+                                Enabled = true;
+                            });
+                        }
                     };
 
                     OpenFiles.Add(selectedFile, watcher);
@@ -231,10 +238,12 @@ namespace NodePyUtil
             NodeFile file = (NodeFile)treeView1.SelectedNode.Tag;
             if (MessageBox.Show(string.Format("Are you sure you want to remove the {0} at '{1}'?\nYou can't undo this action.", file.IsDirectory ? "directory" : "file", SelectedFilePath.Replace("\\", "/").Trim()), "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
             {
+                Enabled = true;
                 if (file.IsDirectory)
                     Device.DeleteDirectory(SelectedFilePath.Replace("\\", "/").Trim());
                 else Device.DeleteFile(SelectedFilePath.Replace("\\", "/").Trim());
                 treeView1.SelectedNode.Remove();
+                Enabled = false;
             }
         }
 
@@ -250,6 +259,7 @@ namespace NodePyUtil
             {
                 if (openFile.ShowDialog() == DialogResult.OK)
                 {
+                    Enabled = false;
                     NodeFile node = (NodeFile)treeView1.SelectedNode.Tag;
                     string uploadDir = (node.IsDirectory ? SelectedFilePath.Replace("\\", "/").Trim() : SelectedFilePath.Substring(1, SelectedFilePath.Length - node.Name.Length - 1)) + "/";
                     foreach (string file in openFile.FileNames)
@@ -257,6 +267,7 @@ namespace NodePyUtil
                         string fileName = Path.GetFileName(file);
                         Upload(file, uploadDir + fileName);
                     }
+                    Enabled = true;
                 }
             }
         }
@@ -299,6 +310,7 @@ namespace NodePyUtil
             {
                 if (openFolder.ShowDialog() == DialogResult.OK)
                 {
+                    Enabled = false;
                     NodeFile file = (NodeFile)treeView1.SelectedNode.Tag;
                     string folderName = GetFolderName(openFolder.SelectedPath);
                     if (file.IsDirectory)
@@ -311,26 +323,30 @@ namespace NodePyUtil
                         string parentDir = SelectedFilePath.Substring(0, SelectedFilePath.Length - file.Name.Length).Replace("\\", "/").Trim();
                         UploadFolder(openFolder.SelectedPath, parentDir + folderName);
                     }
+                    Enabled = true;
                 }
             }
         }
         private void runToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // create repl window and run script file in it
-            // also display the script output in the repl window
-            string scriptFile = SelectedFilePath.Replace("\\", "/").Trim();
+            lock (ThreadLock)
+            {
+                // create repl window and run script file in it
+                // also display the script output in the repl window
+                string scriptFile = SelectedFilePath.Replace("\\", "/").Trim();
 
-            try
-            {
-                using (ReplForm replWindow = new ReplForm(Device.Execute))
+                try
                 {
-                    replWindow.RunCommand($"exec( open( '{scriptFile}' ).read() )");
-                    replWindow.ShowDialog();
+                    using (ReplForm replWindow = new ReplForm(Device.Execute))
+                    {
+                        replWindow.RunCommand($"exec( open( '{scriptFile}' ).read() )");
+                        replWindow.ShowDialog();
+                    }
                 }
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show(ex.Message, $"Error running '{scriptFile}'");
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, $"Error running '{scriptFile}'");
+                }
             }
         }
 
