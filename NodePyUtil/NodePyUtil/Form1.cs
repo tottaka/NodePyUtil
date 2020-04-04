@@ -93,8 +93,12 @@ namespace NodePyUtil
                     SafeFileSystemWatcher watcher = new SafeFileSystemWatcher(Path.GetDirectoryName(localFilePath), Path.GetFileName(localFilePath));
 
                     watcher.BeforeChange += (s, eventArgs) => {
-                        lock(ThreadLock)
-                            Enabled = false;
+                        lock (ThreadLock)
+                        {
+                            Invoke((MethodInvoker)delegate {
+                                Enabled = false;
+                            });
+                        }
                     };
 
                     watcher.AfterChange += (s, eventArgs) => {

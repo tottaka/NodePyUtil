@@ -5,6 +5,7 @@ using System.IO.Ports;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text;
 
 namespace NodePyUtil
 {
@@ -158,11 +159,13 @@ namespace NodePyUtil
                         exec("import sys\nimport ubinascii");
                         exec($"infile = open('{remotePath}', 'wb')");
 
+
+
                         byte[] buffer = new byte[chunkSize];
                         int read = stream.Read(buffer, 0, buffer.Length);
 
                         do {
-                            exec($"try:\n\tinfile.write( ubinascii.a2b_base64( '{ Convert.ToBase64String(buffer, 0, read) }' ) )\nexcept Exception as ex:\n\tinfile.close()\n\traise ex");
+                            exec($"try:\n\tinfile.write( b'{ buffer.ToHex(0, read) }' )\nexcept Exception as ex:\n\tinfile.close()\n\traise ex");
                         } while ((read = stream.Read(buffer, 0, buffer.Length)) > 0);
                         exec("infile.close()");
                     });
@@ -249,5 +252,16 @@ namespace NodePyUtil
     {
         public string Name { get; set; }
         public bool IsDirectory { get; set; }
+    }
+
+    public static class PyHex
+    {
+        public static string ToHex(this byte[] data, int startIndex, int length)
+        {
+            string hexString = string.Empty;
+            for (int i = startIndex; i < startIndex + length; i++)
+                hexString += "\\x" + data[i].ToString("X2");
+            return hexString;
+        }
     }
 }
